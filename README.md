@@ -36,5 +36,30 @@ Fix bug in login
 Lookup:
 Given a hash (e.g., a1b2c3...), Git looks in .git/objects/a1/b2c3d4..., reads the file, and decompresses it.
 
+# Adapting for 1 Trillion Commits
+1. Sharding
+4-char prefix: 65,536 directories.
+
+Distribute: Assign ranges to servers (e.g., 256 servers, ~256 dirs each).
+
+Lookup: Hash b2c3d4e5... → Server b2c3 → File d4e5....
+
+2. Indexing
+Problem: Filesystem lookup slows with millions of files per dir.
+
+Solution: Add an index (e.g., SQLite, LevelDB) mapping hashes to file paths.
+
+Example: { "b2c3d4...": "server3/objects/b2c3/d4..." }.
+
+3. Caching
+Hot Commits: Cache recent or frequent hashes in memory (e.g., Redis).
+
+4. Performance
+Single Lookup: O(1) with filesystem or index.
+
+I/O: Bottleneck is disk/network; SSDs or distributed storage (e.g., S3) help.
+
+
+
 Time complexity: O(1) via filesystem lookup.
 
